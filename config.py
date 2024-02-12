@@ -7,8 +7,6 @@ from dotenv import load_dotenv
 from database import Database
 
 
-# ---------------------------------------------------------------
-
 # get env
 load_dotenv('.env')
 bot_token = os.getenv('BOT_TOKEN')
