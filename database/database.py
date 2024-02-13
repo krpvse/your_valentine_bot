@@ -13,6 +13,9 @@ class Database:
     def get_profile(self, user_id: int) -> list:
         return self.cursor.execute("SELECT * FROM profiles WHERE user_id = ?", (user_id,)).fetchone()
 
+    def get_all_profiles(self) -> list:
+        return self.cursor.execute("SELECT * FROM profiles").fetchall()
+
     def change_profile(self, user_id: int, name: str, description: str) -> None:
         with self.connection:
             self.cursor.execute("UPDATE profiles SET name = ?, description = ? WHERE user_id = ?", (name, description, user_id,))

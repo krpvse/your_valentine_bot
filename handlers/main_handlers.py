@@ -123,12 +123,6 @@ async def get_bot_info(message: types.Message):
     await message.answer(text=help_msg, reply_markup=first_start_ikb)
 
 
-async def ping(message: types.Message):
-    if message.from_user.id == admin_id:
-        print(f'[ADMIN] Bot is active')
-        await bot.send_message(admin_id, 'OK')
-
-
 async def delete_other_messages(message: types.Message):
     print(f'[BOT] User {message.from_user.id} is sent unknown message:\n{message.text}')
     await bot.send_message(admin_id, f'{message.text} / {message.from_user.username} / {message.from_user.full_name}')
@@ -140,7 +134,6 @@ async def delete_other_messages(message: types.Message):
 def register_main_handlers(dp: Dispatcher):
     dp.register_message_handler(callback=start, commands=['start'])
     dp.register_message_handler(callback=get_bot_info, commands=['help'])
-    dp.register_message_handler(callback=ping, commands=['ping'])
     dp.register_message_handler(callback=delete_other_messages)
 
     dp.register_callback_query_handler(callback=send_valentine_card, text_startswith=['send_valentine_card_to'])
