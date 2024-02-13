@@ -9,6 +9,8 @@ from utils.validators import validate_valentine_card
 
 
 async def start(message: types.Message):
+    print(f'[BOT] User {message.from_user.id} starts bot')
+
     db.add_user(user_id=message.from_user.id)
 
     args = message.get_args()
@@ -16,20 +18,22 @@ async def start(message: types.Message):
     if args:
         try:
             profile_id = int(args.replace('profile', ''))
-            print(f'User {message.from_user.id} is looking profile {profile_id}')
+            print(f'[BOT] User {message.from_user.id} is looking profile {profile_id}')
             profile = db.get_profile(profile_id)
         except Exception as e:
             profile = None
-            print(f'Some problems with "profile_id" in start command by user{message.from_user.id}, error: ', e)
+            print(f'[BOT] Some problems with "profile_id" in start command by user {message.from_user.id}, error: ', e)
 
-        if profile:
+        if profile[3]:
             name = profile[3]
             description = profile[4]
 
             profile_img = types.InputFile(f'media/id{profile_id}/avatar{profile_id}.png')
             await bot.send_photo(message.from_user.id, photo=profile_img)
             await bot.send_message(chat_id=message.from_user.id,
-                                   text=await get_profile_msg(name, description),
+                                   text=await get_profile_msg(name, description))
+            await bot.send_message(chat_id=message.from_user.id,
+                                   text='<b>💌 Чтобы отправить валентинку, жми на кнопку клавиатуры ниже</b>',
                                    reply_markup=await get_send_valentine_card_ikb(profile_id))
         else:
             await bot.send_message(chat_id=message.from_user.id,
@@ -66,8 +70,8 @@ async def start(message: types.Message):
 
 async def send_valentine_card(callback: types.CallbackQuery, state: FSMContext):
     profile_id = int(callback.data.replace('send_valentine_card_to=', ''))
-    await callback.message.answer(text='<b>💌 Напиши валентинку</b>\n\n'
-                                       '<i>Сообщение анонимно. Если хочешь указать, от кого эта валентинка - напиши сам</i>',
+    await callback.message.answer(text='<b>💌 Отправь сообщение с валентинкой. Да-да, просто отправь сообщение, и оно сразу отправится</b>\n\n'
+                                       '<i>Сообщение анонимно. Если хочешь указать, от кого эта валентинка - напиши это в тексте сам</i>',
                                   reply_markup=cancel_sending_ikb)
     async with state.proxy() as data:
         data['profile_id'] = profile_id
@@ -75,6 +79,7 @@ async def send_valentine_card(callback: types.CallbackQuery, state: FSMContext):
 
 
 async def send_message(message: types.Message, state: FSMContext):
+    print(f'[BOT] User {message.from_user.id} is trying to send valentine card')
     is_correct_valentine_card, sign_qty = await validate_valentine_card(message.text)
     if is_correct_valentine_card:
         async with state.proxy() as data:
@@ -85,6 +90,7 @@ async def send_message(message: types.Message, state: FSMContext):
         await bot.send_message(chat_id=profile_id, text=f'🎉 У вас новая валентинка!\n\n{valentine_card}', reply_markup=profile_ikb)
 
         await message.answer(text='✔️ Валентинка отправлена', reply_markup=first_start_ikb)
+        print(f'[BOT] User {message.from_user.id} is sent valentine card to profile {profile_id}')
         await state.finish()
     else:
         await message.answer(text=f' <b>😔 Ого как много, придется немного сократить</b>\n\n'
@@ -108,19 +114,23 @@ async def cancel_valentine_card_sending(callback: types.CallbackQuery, state: FS
                            reply_markup=await get_send_valentine_card_ikb(profile_id))
 
     await state.finish()
+    print(f'[BOT] User {callback.from_user.id} is cancel valentine card sending')
     await callback.answer('Отправка отменена')
 
 
 async def get_bot_info(message: types.Message):
+    print(f'[BOT] User {message.from_user.id} clicked on "/help"')
     await message.answer(text=help_msg, reply_markup=first_start_ikb)
 
 
 async def ping(message: types.Message):
     if message.from_user.id == admin_id:
+        print(f'[ADMIN] Bot is active')
         await bot.send_message(admin_id, 'OK')
 
 
 async def delete_other_messages(message: types.Message):
+    print(f'[BOT] User {message.from_user.id} is sent unknown message:\n{message.text}')
     await bot.send_message(admin_id, f'{message.text} / {message.from_user.username} / {message.from_user.full_name}')
     await message.delete()
 

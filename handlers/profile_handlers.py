@@ -11,6 +11,7 @@ from utils.validators import validate_name, validate_description
 
 
 async def change_profile(callback: types.CallbackQuery):
+    print(f'[BOT] User {callback.from_user.id} is working with profile')
     await callback.message.answer(text='<b>🔹Напиши своё имя</b>', reply_markup=cancel_profile_changing_ikb)
     await ProfileStatesGroup.name.set()
 
@@ -20,7 +21,7 @@ async def save_name(message: types.Message, state: FSMContext):
     if is_correct_name:
         async with state.proxy() as data:
             data['name'] = message.text
-        await message.answer(text='<b>🔹Напиши описание для профиля</b>', reply_markup=cancel_profile_changing_ikb)
+        await message.answer(text='<b>🔹Напиши пару слов о себе</b>', reply_markup=cancel_profile_changing_ikb)
         await ProfileStatesGroup.next()
     else:
         await message.answer(text='<b>😒 В твоем имени нет букв?</b>\n\n Напиши имя с буквами',
@@ -81,17 +82,19 @@ async def cancel_profile_changes(callback: types.CallbackQuery, state: FSMContex
                                reply_markup=profile_ikb)
     else:
         await callback.message.answer('Отменили', reply_markup=first_start_ikb)
+    print(f'[BOT] User {callback.from_user.id} is cancel profile changing')
 
 
 async def get_link(callback: types.CallbackQuery):
+    print(f'[BOT] User {callback.from_user.id}] trying to get link')
     profile_id = callback.from_user.id
     profile = db.get_profile(profile_id)
 
     # IF IT IS FIRST START THEN SHOULD TO WRITE PROFILE DATA
     if not profile[3]:
         await bot.send_message(chat_id=callback.from_user.id,
-                               text='Чтобы создать ссылку, нужно указать имя и описание. А ещё загрузить фото. '
-                                    'Люди должны знать, кому оставляют валентинку!')
+                               text='Чтобы создать ссылку, нужно указать свое имя и написать пару слов о себе. А ещё загрузить фото. '
+                                    'Люди должны знать, кому оставляют валентинку! Описание можно будет изменить позже')
         await callback.message.answer(text='<b>🔹Напиши своё имя</b>', reply_markup=cancel_profile_changing_ikb)
         await ProfileStatesGroup.name.set()
     else:
@@ -100,9 +103,11 @@ async def get_link(callback: types.CallbackQuery):
                                text=await get_link_msg(url),
                                reply_markup=profile_ikb,
                                disable_web_page_preview=True)
+        print(f'[BOT] User {callback.from_user.id} got link')
 
 
 async def get_valentine_cards(callback: types.CallbackQuery):
+    print(f'[BOT] User {callback.from_user.id} is looking valentine cards')
     valentine_cards = db.get_valentine_cards(callback.from_user.id)
 
     if valentine_cards:
