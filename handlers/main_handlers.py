@@ -87,7 +87,9 @@ async def send_message(message: types.Message, state: FSMContext):
 
         valentine_card = message.text
         db.save_valentine_card(profile_id, valentine_card)
-        await bot.send_message(chat_id=profile_id, text=f'🎉 У вас новая валентинка!\n\n{valentine_card}', reply_markup=profile_ikb)
+        await bot.send_message(chat_id=profile_id,
+                               text=f'🎉 У тебя новая валентинка!\n\n<i><b>{valentine_card}</b></i>',
+                               reply_markup=profile_ikb)
 
         await message.answer(text='✔️ Валентинка отправлена', reply_markup=first_start_ikb)
         print(f'[BOT] User {message.from_user.id} is sent valentine card to profile {profile_id}')

@@ -114,9 +114,9 @@ async def get_valentine_cards(callback: types.CallbackQuery):
         await callback.message.answer(text=f'🎉 У тебя уже {len(valentine_cards)} валентинок!')
         for n, card in enumerate(valentine_cards):
             if n == len(valentine_cards)-1:
-                await callback.message.answer(text=f'---{n + 1}\n<i>{card[0]}</i>', reply_markup=profile_ikb)
+                await callback.message.answer(text=f'<b>✉️ №{n+1}</b>\n\n<i>{card[0]}</i>', reply_markup=profile_ikb)
             else:
-                await callback.message.answer(text=f'---{n+1}\n<i>{card[0]}</i>')
+                await callback.message.answer(text=f'<b>✉️ №{n+1}</b>\n\n<i>{card[0]}</i>')
     else:
         await callback.message.answer('У тебя ещё нет валентинок. Поделись ссылкой в социальных сетях, чтобы люди знали',
                                       reply_markup=profile_ikb)
