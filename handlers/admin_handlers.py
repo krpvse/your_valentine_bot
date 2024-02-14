@@ -1,11 +1,11 @@
 from aiogram import types, Dispatcher
 
 from config import bot, db, admin_id
-from messages import notification_14feb_msg
+from messages import notification_msg
 from keyboards import *
 
 
-async def send_14feb_notification(message: types.Message):
+async def send_notification(message: types.Message):
     if message.from_user.id == int(admin_id):
         profiles = db.get_all_profiles()
 
@@ -13,7 +13,7 @@ async def send_14feb_notification(message: types.Message):
         for profile in profiles:
             profile_id = profile[1]
             try:
-                await bot.send_message(chat_id=profile_id, text=notification_14feb_msg, reply_markup=first_start_ikb)
+                await bot.send_message(chat_id=profile_id, text=notification_msg, reply_markup=first_start_ikb)
                 sent_counter += 1
             except Exception as e:
                 print(f'[BOT] Error with sending message to user {profile_id}:', e)
@@ -33,4 +33,4 @@ async def ping(message: types.Message):
 
 def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(callback=ping, commands=['ping'])
-    dp.register_message_handler(callback=send_14feb_notification, commands=['send_14feb_notification'])
+    dp.register_message_handler(callback=send_notification, commands=['send_notification'])
